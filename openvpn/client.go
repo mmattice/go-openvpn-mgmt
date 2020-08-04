@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/apparentlymart/go-openvpn-mgmt/demux"
+	"github.com/7Linternational/go-openvpn-mgmt/demux"
 )
 
 var newline = []byte{'\n'}
