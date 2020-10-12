@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"strconv"
 	"time"
@@ -110,6 +111,19 @@ func Dial(addr string, eventCh chan<- Event) (*MgmtClient, error) {
 	}
 
 	return NewClient(conn, eventCh), nil
+}
+
+// Exit sends the "exit" command to rellease the Management Console connetion
+func (c *MgmtClient) Exit() error {
+	var err error
+	// Try to exit openvpn connection
+	exitCmd := []byte("exit")
+	log.Println("readCommandResponsePayload: exit command")
+	err = c.sendCommand(exitCmd)
+	if err != nil {
+		log.Println("ERROR CLOSING CONNECTION")
+	}
+	return err
 }
 
 // HoldRelease instructs OpenVPN to release any management hold preventing
