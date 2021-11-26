@@ -275,6 +275,40 @@ func (c *MgmtClient) Pid() (int, error) {
 	return pid, nil
 }
 
+type LoadStat struct {
+	Clients int
+	BytesIn  int
+	BytesOut int
+}
+
+func (c *MgmtClient) LoadStats() (LoadStat, error) {
+	raw, err := c.simpleCommand("load-stats")
+	if err != nil {
+		return LoadStat{}, err
+	}
+
+	if !bytes.HasPrefix(raw, []byte("nclients=")) {
+		return LoadStat{}, fmt.Errorf("malformed response from OpenVPN")
+	}
+
+	loadStat := LoadStat{}
+	chunks := bytes.Split(raw, fieldSep)
+	for _, chunk := range chunks {
+		if bytes.HasPrefix(chunk, []byte("nclients=")) {
+			loadStat.Clients, err = strconv.Atoi(string(chunk[9:]))
+		} else if bytes.HasPrefix(chunk, []byte("bytesin=")) {
+			loadStat.BytesIn, err = strconv.Atoi(string(chunk[8:]))
+		} else if bytes.HasPrefix(chunk, []byte("bytesout=")) {
+			loadStat.BytesOut, err = strconv.Atoi(string(chunk[9:]))
+		}
+		if err != nil {
+			return LoadStat{}, fmt.Errorf("error parsing pid from OpenVPN: %s", err)
+		}
+	}
+	return loadStat, nil
+}
+
+
 func (c *MgmtClient) sendCommand(cmd []byte) error {
 	_, err := c.wr.Write(cmd)
 	if err != nil {
