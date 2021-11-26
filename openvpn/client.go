@@ -3,13 +3,13 @@ package openvpn
 import (
 	"bytes"
 	"fmt"
+	"github.com/mmattice/go-openvpn-mgmt/demux"
 	"io"
 	"log"
 	"net"
 	"strconv"
 	"time"
 
-	"github.com/7Linternational/go-openvpn-mgmt/demux"
 )
 
 var newline = []byte{'\n'}
